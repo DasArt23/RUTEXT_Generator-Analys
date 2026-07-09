@@ -1,0 +1,10 @@
+[project]
+name = "rutext-gen"
+version = "0.1.0"
+description = "Приложение дял генерации текста и анализа"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+project = "main:main"
