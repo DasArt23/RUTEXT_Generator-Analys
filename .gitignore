@@ -11,3 +11,8 @@ wheels/
 
 #Log files
 app.log
+
+#CSV and text files
+*.csv
+*.txt
+

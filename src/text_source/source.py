@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from typing import Any, Iterable
+from work_with_file import WorkWithFile
 import requests
+import logging
 
 
 class Source(ABC):
@@ -20,11 +22,11 @@ class Source(ABC):
         pass
 
 
-class ParseText(Source):
+class ParseSource(Source):
     name = "Parse text"
 
     def __init__(self, **kwargs: Any):
-        self.urls: list[str] | None = kwargs['urls'] if 'urls' in kwargs else None
+        self.urls: Iterable[str] | None = kwargs['urls'] if 'urls' in kwargs else None
         self.ua = UserAgent()
 
     def get_text(self) -> Iterable[str]:
@@ -42,7 +44,9 @@ class ParseText(Source):
     @staticmethod
     def get_page(url: str, headers: dict[str, Any]) -> requests.Response:
         res = requests.get(url, headers=headers, timeout=10)
+        logging.info(f"Страница по {url} обработана")
         res.raise_for_status()
+        res.encoding = res.apparent_encoding
         return res
 
     @staticmethod
@@ -56,3 +60,23 @@ class ParseText(Source):
         cor_text = '\n'.join(lines)
         return cor_text
 
+
+class FileSource(Source):
+    name = "File Text"
+
+    def __init__(self, **kwargs: Any):
+        self.files: Iterable[str] | None = kwargs['files'] if 'files' in kwargs else None
+        self.dir_name: str = kwargs['dir_name'] if 'dir_name' in kwargs else "exFiles"
+        self.FileManager: WorkWithFile = WorkWithFile(files_path=self.dir_name)
+
+    def get_text(self) -> Iterable[str]:
+        if not self.files:
+            return
+        return (self.get_text_from_file(filename) for filename in self.files)
+
+    def get_text_from_file(self, filename: str) -> str:
+        text = self.FileManager.read_file(filename)
+        if not text:
+            logging.info("Текст из файла {filename} не получен")
+        return text
+    

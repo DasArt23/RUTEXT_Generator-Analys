@@ -10,10 +10,7 @@ logging.basicConfig(
 
 
 def main():
-    app = AppConfig(
-        urls=[""],
-        filenames=[],
-    )
+    app = AppConfig()
     app.run()
 
 
