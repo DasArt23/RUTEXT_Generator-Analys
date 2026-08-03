@@ -1,8 +1,9 @@
 import logging
-from config import AppConfig
+from config import TextsGetter
 
 logging.basicConfig(
     filename='app.log',
+    filemode='w',
     level=logging.DEBUG,
     format='%(asctime)s [%(levelname)s] %(message)s',
     encoding='utf-8'
@@ -10,8 +11,10 @@ logging.basicConfig(
 
 
 def main():
-    app = AppConfig()
-    app.run()
+    texts = TextsGetter()
+    data = texts.run()
+    for text in data:
+        print(text)
 
 
 if __name__ == "__main__":

@@ -39,15 +39,19 @@ class ParseSource(Source):
         user_agent = self.ua.random
         headers = {'User-Agent': user_agent}
         res = self.get_page(url, headers)
-        return self.page_text(res)
+        return self.page_text(res) if res else ""
 
     @staticmethod
     def get_page(url: str, headers: dict[str, Any]) -> requests.Response:
-        res = requests.get(url, headers=headers, timeout=10)
-        logging.info(f"Страница по {url} обработана")
-        res.raise_for_status()
-        res.encoding = res.apparent_encoding
-        return res
+        try:
+            res = requests.get(url, headers=headers, timeout=10)
+            logging.info(f"Страница по {url} обработана")
+            res.raise_for_status()
+            res.encoding = res.apparent_encoding
+            return res
+        except requests.exceptions.MissingSchema:
+            logging.error(f"Invalid URL: {url}")
+            return None
 
     @staticmethod
     def page_text(page: requests.Response) -> str:
@@ -77,6 +81,6 @@ class FileSource(Source):
     def get_text_from_file(self, filename: str) -> str:
         text = self.FileManager.read_file(filename)
         if not text:
-            logging.info("Текст из файла {filename} не получен")
+            logging.info(f"Текст из файла {filename} не получен")
         return text
     
